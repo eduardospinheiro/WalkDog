@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "565625356376",
+    "firebase_url": "https://walkdog-f19b1.firebaseio.com",
+    "project_id": "walkdog-f19b1",
+    "storage_bucket": "walkdog-f19b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:565625356376:android:5d70afd4b1c28ff3",
+        "android_client_info": {
+          "package_name": "com.faculdadedombosco.eduardopinheiro.walkdog"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "565625356376-69r5kvggso3lgqp2vgr2v1g9ra4ni2id.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.faculdadedombosco.eduardopinheiro.walkdog",
+            "certificate_hash": "7473a48b90e952ac919db5daa6e66b3c67745728"
+          }
+        },
+        {
+          "client_id": "565625356376-3pq6vcq13noumlkra7qj8l04h3mtm20u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW--xWyUZaAHInNfD6xKDj5Qm8FjRPZbE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "565625356376-3pq6vcq13noumlkra7qj8l04h3mtm20u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
