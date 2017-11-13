@@ -1,20 +1,16 @@
 package com.faculdadedombosco.eduardopinheiro.walkdog.Models;
 
-/**
- * Created by Eduardo Lion on 10/11/2017.
- */
-
 public class Passeio {
 
-    private String UId;
+    private boolean BuscouCachorro;
     private Coordenadas Localizacao;
 
-    public String getUId() {
-        return UId;
+    public boolean getBuscouCachorro() {
+        return BuscouCachorro;
     }
 
-    public void setUId(String UId) {
-        this.UId = UId;
+    public void setBuscouCachorro(boolean buscouCachorro) {
+        this.BuscouCachorro = buscouCachorro;
     }
 
     public Coordenadas getLocalizacao() {
@@ -26,8 +22,4 @@ public class Passeio {
     }
 }
 
-class Coordenadas
-{
-    public String Latitude;
-    public String Longitude;
-}
+

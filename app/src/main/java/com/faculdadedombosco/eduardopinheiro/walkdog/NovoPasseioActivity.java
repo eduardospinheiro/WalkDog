@@ -1,8 +1,13 @@
 package com.faculdadedombosco.eduardopinheiro.walkdog;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,18 +19,33 @@ import android.widget.Toast;
 
 import com.faculdadedombosco.eduardopinheiro.walkdog.Models.*;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class NovoPasseioActivity extends AppCompatActivity {
+public class NovoPasseioActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private DatabaseReference mDatabase;
     private ValueEventListener mPasseioListener;
     private static final String TAG = "NovoPasseioActivity";
+    private FirebaseAuth mAuth;
 
+    private GoogleApiClient mGoogleApiClient;
+
+    private LocationRequest mLocationRequest;
+
+    private Coordenadas mCoordenadasUsuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +66,13 @@ public class NovoPasseioActivity extends AppCompatActivity {
         });
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -60,7 +87,7 @@ public class NovoPasseioActivity extends AppCompatActivity {
                 // Get Post object and use the values to update the UI
                 Passeio passeio = dataSnapshot.getValue(Passeio.class);
                 // [START_EXCLUDE]
-                Toast.makeText(NovoPasseioActivity.this, "existe um novo passeio" ,
+                Toast.makeText(NovoPasseioActivity.this, "existe um novo passeio",
                         Toast.LENGTH_LONG).show();
                 // [END_EXCLUDE]
             }
@@ -109,8 +136,34 @@ public class NovoPasseioActivity extends AppCompatActivity {
     }
 
     public void irParaMapaPasseador() {
-        Intent intent = new Intent(this, MapaPasseadorActivity.class);
-        startActivity(intent);
+
+        Usuario usuario = new Usuario();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        Passeio passeio = new Passeio();
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Location mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        Coordenadas coordenadas = new Coordenadas();
+        double varLatitude = mLocation.getLatitude();
+        coordenadas.setLatitude(mLocation.getLatitude());
+        coordenadas.setLongitude(mLocation.getLongitude());
+        passeio.setLocalizacao(coordenadas);
+        passeio.setBuscouCachorro(false);
+
+
+
+        mDatabase.child("passeios").child(currentUser.getUid()).setValue(passeio);
+        //salva o passeio e vai para  a proxima
+//        Intent intent = new Intent(this, MapaPasseadorActivity.class);
+//        startActivity(intent);
     }
 
     public void showAlertDialogButtonClicked() {
@@ -128,5 +181,41 @@ public class NovoPasseioActivity extends AppCompatActivity {
         // create and show the alert dialog
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        mLocationRequest.setInterval(30000); // Update location every second
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
     }
 }

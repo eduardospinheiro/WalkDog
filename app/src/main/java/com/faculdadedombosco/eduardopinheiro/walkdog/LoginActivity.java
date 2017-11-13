@@ -76,6 +76,8 @@ public class LoginActivity extends AppCompatActivity implements
     private static final String TAG = "EmailPassword";
     private DatabaseReference mDatabase;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
