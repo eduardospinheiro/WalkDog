@@ -6,24 +6,24 @@ package com.faculdadedombosco.eduardopinheiro.walkdog.Models;
 
 public class Coordenadas
 {
-    private Double Latitude;
-    private Double Longitude;
+    private Double latitude;
+    private Double longitude;
 
     public Coordenadas (){}
 
     public Double getLatitude() {
-        return Latitude;
+        return latitude;
     }
 
     public void setLatitude(Double latitude) {
-        Latitude = latitude;
+        this.latitude = latitude;
     }
 
     public Double getLongitude() {
-        return Longitude;
+        return longitude;
     }
 
     public void setLongitude(Double longitude) {
-        Longitude = longitude;
+        this.longitude = longitude;
     }
 }

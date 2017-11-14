@@ -7,43 +7,43 @@ package com.faculdadedombosco.eduardopinheiro.walkdog.Models;
 public class Usuario {
     public Usuario(){}
 
-    private String Nome;
+    private String nome;
 
     public String getNome() {
-        return Nome;
+        return nome;
     }
 
     public void setNome(String nome) {
-        this.Nome = nome;
+        this.nome = nome;
     }
 
-    private String Telefone;
+    private String telefone;
 
-    private String Cpf;
+    private String cpf;
 
     public String getTelefone() {
-        return Telefone;
+        return telefone;
     }
 
     public void setTelefone(String telefone) {
-        Telefone = telefone;
+        this.telefone = telefone;
     }
 
     public String getCpf() {
-        return Cpf;
+        return cpf;
     }
 
     public void setCpf(String cpf) {
-        Cpf = cpf;
+        this.cpf = cpf;
     }
 
-    private String Email;
+    private String email;
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public void setEmail(String email) {
-        Email = email;
+        this.email = email;
     }
 }

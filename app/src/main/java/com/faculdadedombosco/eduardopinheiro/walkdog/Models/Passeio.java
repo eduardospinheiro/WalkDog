@@ -2,23 +2,25 @@ package com.faculdadedombosco.eduardopinheiro.walkdog.Models;
 
 public class Passeio {
 
-    private boolean BuscouCachorro;
-    private Coordenadas Localizacao;
+    private boolean buscouCachorro;
+    private Coordenadas localizacao;
+
+    public Passeio(){}
 
     public boolean getBuscouCachorro() {
-        return BuscouCachorro;
+        return buscouCachorro;
     }
 
     public void setBuscouCachorro(boolean buscouCachorro) {
-        this.BuscouCachorro = buscouCachorro;
+        this.buscouCachorro = buscouCachorro;
     }
 
     public Coordenadas getLocalizacao() {
-        return Localizacao;
+        return localizacao;
     }
 
     public void setLocalizacao(Coordenadas localizacao) {
-        Localizacao = localizacao;
+        this.localizacao = localizacao;
     }
 }
 
