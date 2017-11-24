@@ -10,14 +10,15 @@
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality. 
+         location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.GET_TASKS"/>
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -35,6 +36,7 @@
         </activity>
         <activity
             android:name=".NovoPasseioActivity"
+            android:launchMode="singleInstance"
             android:label="@string/title_activity_novo_passeio"
             android:theme="@style/AppTheme.NoActionBar" />
         <!--
@@ -43,7 +45,7 @@
              Note that the API key is linked to the encryption key used to sign the APK.
              You need a different API key for each encryption key, including the release key that is used to
              sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -51,7 +53,26 @@
 
         <activity
             android:name=".MapaPasseadorActivity"
-            android:label="@string/title_activity_mapa_passeador"></activity>
+            android:label="@string/title_activity_mapa_passeador" />
+        <activity
+            android:name=".MapaSolicitanteActivity"
+            android:label="@string/title_activity_mapa_passeador" />
+        <activity
+            android:name=".RegistrarActivity"
+            android:label="@string/title_activity_registrar" />
+        <activity
+            android:name=".AvaliarActivity"
+            android:label="@string/title_activity_avaliar"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <service
+            android:name=".services.WalkdogNotificationExtender"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.onesignal.NotificationExtender" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -1,14 +1,23 @@
+plugins {
+    id 'com.onesignal.androidsdk.onesignal-gradle-plugin' version '0.7.0'
+}
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
 apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.faculdadedombosco.eduardopinheiro.walkdog"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [onesignal_app_id               : "ff663e58-33b6-49a1-94d0-c70fad900aa8",
+                                // Project number pulled from dashboard, local value is ignored.
+                                onesignal_google_project_number: "565625356376"]
     }
     buildTypes {
         release {
@@ -30,12 +39,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    compile 'com.onesignal:OneSignal:[3.6.5, 3.99.99]'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.google.code.gson:gson:2.6.1'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
 }
 
-
-
-
-
-
-
-apply plugin: 'com.google.gms.google-services'
+repositories {
+    maven { url 'https://maven.google.com' }
+}

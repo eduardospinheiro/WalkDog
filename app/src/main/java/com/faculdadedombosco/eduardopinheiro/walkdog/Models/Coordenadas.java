@@ -1,4 +1,4 @@
-package com.faculdadedombosco.eduardopinheiro.walkdog.Models;
+package com.faculdadedombosco.eduardopinheiro.walkdog.models;
 
 /**
  * Created by Eduardo Lion on 10/11/2017.

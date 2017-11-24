@@ -16,9 +16,20 @@
         tools:context="com.faculdadedombosco.eduardopinheiro.walkdogv1.MapaPasseadorActivity" />
 
     <Button
-        android:id="@+id/btnBuscarEntregar"
+        android:id="@+id/btnBuscar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="BUSQUEI O CÃO" />
+        android:onClick="busqueiCachorro"
+        android:enabled="false"
+        android:text="AGUARDANDO SOLICITANTES..." />
+
+    <Button
+        android:id="@+id/btnEntregar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:onClick="entregueiCachorro"
+        android:visibility="gone"
+        android:text="ENTREGUEI O CÃO" />
 </RelativeLayout>

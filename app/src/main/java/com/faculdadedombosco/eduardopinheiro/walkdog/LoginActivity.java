@@ -3,28 +3,19 @@ package com.faculdadedombosco.eduardopinheiro.walkdog;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.AutomaticZenRule;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -33,18 +24,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.faculdadedombosco.eduardopinheiro.walkdog.Models.Usuario;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidUserException;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -72,11 +58,9 @@ public class LoginActivity extends AppCompatActivity implements
 
     //firebase
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private static final String TAG = "EmailPassword";
     private DatabaseReference mDatabase;
-
-
+    private ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,71 +92,53 @@ public class LoginActivity extends AppCompatActivity implements
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-                // ...
-            }
-        };
+        if (mAuth.getCurrentUser() != null) {
+            Intent intent = new Intent(LoginActivity.this, NovoPasseioActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+    private void loginAccount(String email, String password) {
+        progress = new ProgressDialog(this);
+        progress.setTitle("Carregando");
+        progress.setMessage("Entrando, um momento...");
+        progress.setCancelable(false);
+        progress.show();
+
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Intent intent = new Intent(LoginActivity.this, NovoPasseioActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Usuário ou senha inválidos.",
+                            Toast.LENGTH_SHORT).show();
+                    progress.dismiss();
+                }
+            }
+        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        try {
-            currentUser.reload().addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    if (e instanceof FirebaseAuthInvalidUserException) {
-//                        Log.d(TheApp.LOG_TAG, "user doesn't exist anymore");
-//                        createUser();
-                    }
-                }
-            });
-
-        }
-        catch (NullPointerException ex)
-        {
-            currentUser = null;
-        }
-
-        if (currentUser != null)
-        {
-            //vai para a proxima tela, está logado
-            startActivity(new Intent(LoginActivity.this, NovoPasseioActivity.class));
-        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
     }
-
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
         }
-
-//        getLoaderManager().initLoader(0, null, this);
     }
 
     private boolean mayRequestContacts() {
@@ -197,9 +163,6 @@ public class LoginActivity extends AppCompatActivity implements
         return false;
     }
 
-    /**
-     * Callback received when a permissions request has been completed.
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -210,44 +173,9 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
 
 
-    }
-
-    private void createAccount(String email, String password) {
-        Log.d(TAG, "createAccount:" + email);
-
-        // [START create_user_with_email]
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            //vai para a proxima tela
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
-                        }
-
-                        // [START_EXCLUDE]
-                        //hideProgressDialog();
-                        // [END_EXCLUDE]
-                    }
-                });
-        // [END create_user_with_email]
     }
 
     private boolean isEmailValid(String email) {
@@ -265,9 +193,6 @@ public class LoginActivity extends AppCompatActivity implements
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -318,7 +243,12 @@ public class LoginActivity extends AppCompatActivity implements
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
+        if (TextUtils.isEmpty(password)) {
+            mPasswordView.setError(getString(R.string.error_field_required));
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
@@ -337,34 +267,11 @@ public class LoginActivity extends AppCompatActivity implements
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
             showProgress(true);
-
-            createAccount(mEmailView.getText().toString(), mPasswordView.getText().toString());
+            loginAccount(mEmailView.getText().toString(), mPasswordView.getText().toString());
             showProgress(false);
-            Toast.makeText(LoginActivity.this, "Usuário Cadastrado",
-                    Toast.LENGTH_SHORT).show();
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-
-            Usuario usuario = new Usuario();
-            usuario.setCpf(mCpfView.getText().toString());
-            usuario.setNome(mNomeView.getText().toString());
-            usuario.setTelefone(mTelefoneView.getText().toString());
-            usuario.setEmail(mEmailView.getText().toString());
-
-
-            mDatabase.child("usuarios").child(currentUser.getUid()).setValue(usuario);
-
-            if (currentUser != null)
-            {
-                //vai para a proxima tela, está logado
-                startActivity(new Intent(LoginActivity.this, NovoPasseioActivity.class));
-            }
         }
     }
 
@@ -377,6 +284,20 @@ public class LoginActivity extends AppCompatActivity implements
 
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
+    }
+
+    public void goToRegistrar (View view) {
+        Intent intent = new Intent(LoginActivity.this, RegistrarActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (progress != null) {
+            progress.dismiss();
+        }
     }
 }
 
